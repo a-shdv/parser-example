@@ -1,11 +1,10 @@
 package com.company;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,12 +18,13 @@ public class Main {
         }
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Sheet1");
+        DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
         Row rowInit = sheet.createRow(0);
-        Cell cellTotalLength = rowInit.createCell(0);
-        Cell cellSpeed = rowInit.createCell(1);
-        cellTotalLength.setCellValue("Total length");
+        Cell cellSpeed = rowInit.createCell(0);
+        Cell cellTotalLength = rowInit.createCell(1);
         cellSpeed.setCellValue("Speed");
+        cellTotalLength.setCellValue("Total length");
 
         try (BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Антон\\Desktop\\syslog"))) {
             String line;
@@ -41,7 +41,7 @@ public class Main {
                 String totalLength="";
                 Matcher totalLengthMatcher = totalLengthPattern.matcher(line);
                 if (totalLengthMatcher.find()) {
-                    totalLength = totalLengthMatcher.group(1);
+                    totalLength = decimalFormat.format(Double.parseDouble(totalLengthMatcher.group(1)));
                     System.out.println("Total Length: " + totalLength);
                 }
                 for (int i = 0; i < 4; i++) {
@@ -52,18 +52,18 @@ public class Main {
                 String speed = "";
                 Matcher speedMatcher = speedPattern.matcher(line);
                 if (speedMatcher.find()) {
-                    speed = speedMatcher.group(1);
+                    speed = decimalFormat.format(Double.parseDouble(speedMatcher.group(1)));
                     System.out.println("Speed: " + speed);
                 }
 
                 Row rowNext = sheet.createRow(step);
                 Cell cell1 = rowNext.createCell(0);
                 Cell cell2 = rowNext.createCell(1);
-                if (!totalLength.isEmpty())
-                    cell1.setCellValue(totalLength);
+                if (!totalLength.equals("0,00") && !totalLength.equals("") && !totalLength.equals("0"))
+                    cell2.setCellValue(totalLength);
                 else
                     continue;
-                cell2.setCellValue(speed);
+                cell1.setCellValue(speed);
 
                 workbook.write(outputStream);
                 step++;
