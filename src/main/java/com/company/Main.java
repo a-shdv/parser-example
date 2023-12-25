@@ -35,7 +35,7 @@ public class Main {
 
                 // Define a pattern for Total Length and Speed
                 Pattern totalLengthPattern = Pattern.compile("Total length: (\\d+\\.\\d+)");
-                Pattern speedPattern = Pattern.compile("Speed\\(mm/s\\): (\\d+\\.\\d+E\\d+)");
+                Pattern speedPattern = Pattern.compile("Speed\\(mm/s\\): (\\d+\\.\\d)");
 
                 // Match Total Length
                 String totalLength="";
@@ -59,7 +59,10 @@ public class Main {
                 Row rowNext = sheet.createRow(step);
                 Cell cell1 = rowNext.createCell(0);
                 Cell cell2 = rowNext.createCell(1);
-                cell1.setCellValue(totalLength);
+                if (!totalLength.isEmpty())
+                    cell1.setCellValue(totalLength);
+                else
+                    continue;
                 cell2.setCellValue(speed);
 
                 workbook.write(outputStream);
