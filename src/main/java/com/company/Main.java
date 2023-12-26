@@ -1,4 +1,4 @@
-package com.company.avg;
+package com.company;
 
 import com.company.eurofilter.OneEuroFilter;
 import org.apache.poi.ss.usermodel.Cell;
@@ -12,14 +12,14 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.logging.Logger;
 
-public class Final {
+public class Main {
     static String rawSpeed = "";
     static double speed = 0.0;
     static int avgLength = 0;
     static int avgFilteredLength = 0;
 
     public static void main(String[] args) {
-        Logger log = Logger.getLogger(Final.class.getName());
+        Logger log = Logger.getLogger(Main.class.getName());
 
         FileOutputStream outputStream = null;
         try {
@@ -34,10 +34,16 @@ public class Final {
         NumberFormat format = NumberFormat.getInstance(Locale.getDefault());
 
         Row rowInit = sheet.createRow(0);
+
+        // HEADER: speed
         Cell cellSpeed = rowInit.createCell(0);
         cellSpeed.setCellValue("Speed");
+
+        // HEADER: length
         Cell cellLength = rowInit.createCell(1);
         cellLength.setCellValue("AVG length");
+
+        // HEADER: filtered length
         Cell cellFilteredLength = rowInit.createCell(2);
         cellFilteredLength.setCellValue("AVG filtered length");
 
@@ -47,6 +53,7 @@ public class Final {
             OneEuroFilter oef = new OneEuroFilter(20);
 
             while ((line = br.readLine()) != null) {
+                // parsing
                 rawSpeed = line.split("\t")[0];
                 if (rawSpeed.contains(",")) {
                     number = format.parse(rawSpeed);
@@ -54,17 +61,19 @@ public class Final {
                 } else {
                     speed = Double.parseDouble(rawSpeed);
                 }
-//                speed = decimalFormat.format(line.split("\t")[0]);
                 avgLength = Integer.parseInt(line.split("\t")[1]);
                 avgFilteredLength = (int) oef.filter(avgLength);
 
+                // speed
                 Row rowNext = sheet.createRow(step);
                 Cell cell1 = rowNext.createCell(0);
                 cell1.setCellValue(speed);
 
+                // average length
                 Cell cell2 = rowNext.createCell(1);
                 cell2.setCellValue(avgLength);
 
+                // filtered average length
                 Cell cell3 = rowNext.createCell(2);
                 cell3.setCellValue(avgFilteredLength);
 
