@@ -1,4 +1,4 @@
-package com.company;
+package com.company.avg;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -8,11 +8,11 @@ import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Main {
+public class AverageLength {
     public static void main(String[] args) {
         FileOutputStream outputStream = null;
         try {
-            outputStream = new FileOutputStream("C:\\Users\\Антон\\Desktop\\data.xlsx");
+            outputStream = new FileOutputStream("C:\\Users\\Антон\\Desktop\\data-avg-filtered.xlsx");
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -24,26 +24,27 @@ public class Main {
         Cell cellSpeed = rowInit.createCell(0);
         Cell cellTotalLength = rowInit.createCell(1);
         cellSpeed.setCellValue("Speed");
-        cellTotalLength.setCellValue("Total length");
+        cellTotalLength.setCellValue("AVG length");
 
-        try (BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Антон\\Desktop\\syslog"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Антон\\Desktop\\syslog-avg-filtered-0.0.1"))) {
             String line;
             int step = 1;
             while ((line = br.readLine()) != null) {
-                if (!line.contains("Total length"))
+                if (!line.contains("AVG length"))
                     continue;
 
                 // Define a pattern for Total Length and Speed
-                Pattern totalLengthPattern = Pattern.compile("Total length: (\\d+\\.\\d+)");
+                Pattern avgLengthPattern = Pattern.compile("AVG length: (\\d+)");
                 Pattern speedPattern = Pattern.compile("Speed\\(mm/s\\): (\\d+\\.\\d)");
 
                 // Match Total Length
-                String totalLength="";
-                Matcher totalLengthMatcher = totalLengthPattern.matcher(line);
-                if (totalLengthMatcher.find()) {
-                    totalLength = decimalFormat.format(Double.parseDouble(totalLengthMatcher.group(1)));
-                    System.out.println("Total Length: " + totalLength);
+                String avgLength="";
+                Matcher avgLengthMatcher = avgLengthPattern.matcher(line);
+                if (avgLengthMatcher.find()) {
+                    avgLength = avgLengthMatcher.group(1);
+                    System.out.println("AVG length: " + avgLength);
                 }
+
                 for (int i = 0; i < 4; i++) {
                     line = br.readLine();
                 }
@@ -59,8 +60,8 @@ public class Main {
                 Row rowNext = sheet.createRow(step);
                 Cell cell1 = rowNext.createCell(0);
                 Cell cell2 = rowNext.createCell(1);
-                if (!totalLength.equals("0,00") && !totalLength.equals("") && !totalLength.equals("0"))
-                    cell2.setCellValue(totalLength);
+                if (!avgLength.equals("0,00") && !avgLength.equals("") && !avgLength.equals("0"))
+                    cell2.setCellValue(avgLength);
                 else
                     continue;
                 cell1.setCellValue(speed);
