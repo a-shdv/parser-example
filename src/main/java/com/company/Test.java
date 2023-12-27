@@ -1,5 +1,6 @@
-package com.company.avg;
+package com.company;
 
+import com.company.eurofilter.OneEuroFilter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -8,17 +9,20 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.text.DecimalFormat;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Test {
-    static String avgFilteredLength;
-    static String avgLength = "";
+    private static final Logger log = Logger.getLogger(Test.class.getName());
+    static int avgFilteredLength;
+    static int avgLength;
+
 
     public static void main(String[] args) {
         FileOutputStream outputStream = null;
         try {
-            outputStream = new FileOutputStream("C:\\Users\\Антон\\Desktop\\data-comparison.xlsx");
+            outputStream = new FileOutputStream("C:\\Users\\Антон\\Desktop\\avg-0.0.0.xlsx");
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -39,26 +43,25 @@ public class Test {
         try (BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Антон\\Desktop\\syslog"))) {
             String line;
             int step = 1;
+            OneEuroFilter oef = new OneEuroFilter(15);
+
             while ((line = br.readLine()) != null) {
-                Pattern avgLengthPattern = Pattern.compile("AVG length: (\\d+)");
-                Pattern avgFilteredLengthPattern = Pattern.compile("AVG filtered length: (\\d+)");
                 Pattern speedPattern = Pattern.compile("Speed\\(mm/s\\): (\\d+\\.\\d)");
+                Pattern avgLengthPattern = Pattern.compile("AVG length: (\\d+)");
+//                Pattern avgFilteredLengthPattern = Pattern.compile("AVG filtered length: (\\d+)");
 
                 // avglength
                 Matcher avgLengthMatcher = avgLengthPattern.matcher(line);
-                if (avgLengthMatcher.find()) {
-                    avgLength = avgLengthMatcher.group(1);
-                    System.out.printf("LengthOpto2: %s\n", avgLength);
+                if (avgLengthMatcher.find() && !avgLengthMatcher.group(1).isEmpty() && !avgLengthMatcher.group(1).equals("0")) {
+                    avgLength = Integer.parseInt(avgLengthMatcher.group(1));
+                    System.out.printf("avgLength: %s\n", avgLength);
+                    avgFilteredLength = (int) oef.filter(avgLength);
+                    System.out.println("avgFilteredLength: " + avgFilteredLength);
                     continue;
                 }
 
                 // avgFilteredLength
-                Matcher avgFilterLengthMatcher = avgFilteredLengthPattern.matcher(line);
-                if (avgFilterLengthMatcher.find()) {
-                    avgFilteredLength = avgFilterLengthMatcher.group(1);
-                    System.out.println("AVG filtered length: " + avgFilteredLength);
-                    continue;
-                }
+                // Matcher avgFilterLengthMatcher = avgFilteredLengthPattern.matcher(line);
 
                 // Match Speed
                 String speed = "";
@@ -68,8 +71,7 @@ public class Test {
                     System.out.println("Speed: " + speed);
                 } else continue;
 
-                if (!avgLength.equals("") && !avgLength.equals("0")
-                        && !avgFilteredLength.equals("") && !avgFilteredLength.equals("0")) {
+                if (avgLength != 0) {
                     Row rowNext = sheet.createRow(step);
                     Cell cell1 = rowNext.createCell(0);
                     cell1.setCellValue(speed);
@@ -79,17 +81,15 @@ public class Test {
 
                     Cell cell3 = rowNext.createCell(2);
                     cell3.setCellValue(avgFilteredLength);
+                    step++;
                 }
 
                 workbook.write(outputStream);
-                step++;
             }
             workbook.close();
             outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.info(e.getMessage());
         }
     }
 }
