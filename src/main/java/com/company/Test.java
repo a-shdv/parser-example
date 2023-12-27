@@ -20,7 +20,7 @@ public class Test {
 
 
     public static void main(String[] args) {
-        FileOutputStream outputStream = null;
+        FileOutputStream outputStream;
         try {
             outputStream = new FileOutputStream("C:\\Users\\Антон\\Desktop\\avg-0.0.0.xlsx");
         } catch (FileNotFoundException e) {
