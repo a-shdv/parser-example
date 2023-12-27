@@ -66,12 +66,12 @@ public class Test {
                 // Match Speed
                 String speed = "";
                 Matcher speedMatcher = speedPattern.matcher(line);
-                if (speedMatcher.find()) {
+                if (speedMatcher.find() && !speedMatcher.group(1).isEmpty() && !speedMatcher.group(1).equals("0.0")) {
                     speed = decimalFormat.format(Double.parseDouble(speedMatcher.group(1)));
                     System.out.println("Speed: " + speed);
                 } else continue;
 
-                if (avgLength != 0) {
+                if (avgLength != 0 && !speed.equals("0.0")) {
                     Row rowNext = sheet.createRow(step);
                     Cell cell1 = rowNext.createCell(0);
                     cell1.setCellValue(speed);
