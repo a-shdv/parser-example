@@ -17,8 +17,7 @@ public class Main {
     static String lengthSmoothed = "";
 
     public static void main(String[] args) {
-
-        CompletableFuture<Void> result =  CompletableFuture.runAsync(() -> {
+        CompletableFuture<Void> result = CompletableFuture.runAsync(() -> {
             FileOutputStream outputStream = null;
             try {
                 outputStream = new FileOutputStream("C:\\Users\\Антон\\Desktop\\result-1.0.0.xlsx");
@@ -73,8 +72,18 @@ public class Main {
                         System.out.println("Speed: " + speed);
                     } else continue;
 
-                    if (!lengthSmoothed.isEmpty() && !lengthSmoothed.equals("0.0") && !lengthSmoothed.equals("0,0")
-                            && !length.isEmpty() && !length.equals("0.0") && !length.equals("0,0")) {
+                    if ((!length.isEmpty() &&
+                            !length.equals("0") &&
+                            !length.equals("0.0") &&
+                            !length.equals("0.00") &&
+                            !length.equals("0,0") &&
+                            !length.equals("0,00")) &&
+                            (!lengthSmoothed.isEmpty() &&
+                                    !lengthSmoothed.equals("0") &&
+                                    !lengthSmoothed.equals("0.0") &&
+                                    !lengthSmoothed.equals("0.00") &&
+                                    !lengthSmoothed.equals("0,0") &&
+                                    !lengthSmoothed.equals("0,00"))) {
                         Row rowNext = sheet.createRow(step);
                         Cell cell1 = rowNext.createCell(0);
                         cell1.setCellValue(speed);
@@ -84,10 +93,10 @@ public class Main {
 
                         Cell cell3 = rowNext.createCell(2);
                         cell3.setCellValue(length);
+                        step++;
+                        workbook.write(outputStream);
                     }
 
-                    workbook.write(outputStream);
-                    step++;
                 }
                 workbook.close();
                 outputStream.close();
@@ -97,7 +106,6 @@ public class Main {
                 throw new RuntimeException(e);
             }
         });
-        System.out.println("test");
         result.join();
     }
 }
